@@ -27,7 +27,10 @@ api.interceptors.request.use((config) => {
 
 // If we get a 401 (unauthorized), redirect to login
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        if (response.data) fixImageUrls(response.data);
+        return response;
+    },
     (error) => {
         if (error.response && error.response.status === 401) {
             // Only redirect if we're on an admin page
@@ -41,5 +44,29 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+// Helper to recursively fix image paths in all API responses
+const BASE_DOMAIN = import.meta.env.PROD ? 'https://airy-art-production-4ad7.up.railway.app' : 'http://localhost:5000';
+
+function fixImageUrls(data) {
+    if (!data) return;
+    if (Array.isArray(data)) {
+        data.forEach((item, index) => {
+            if (typeof item === 'string' && item.startsWith('/uploads/')) {
+                data[index] = `${BASE_DOMAIN}${item}`;
+            } else if (typeof item === 'object') {
+                fixImageUrls(item);
+            }
+        });
+    } else if (typeof data === 'object') {
+        Object.keys(data).forEach(key => {
+            if (typeof data[key] === 'string' && data[key].startsWith('/uploads/')) {
+                data[key] = `${BASE_DOMAIN}${data[key]}`;
+            } else if (typeof data[key] === 'object') {
+                fixImageUrls(data[key]);
+            }
+        });
+    }
+}
 
 export default api;
