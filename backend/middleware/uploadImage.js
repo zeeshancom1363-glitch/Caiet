@@ -8,8 +8,9 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { getUploadsPath } = require('../utils/volumePath');
 
-const uploadsPath = process.env.DATA_VOLUME ? path.join(process.env.DATA_VOLUME, 'uploads') : path.join(__dirname, '..', 'uploads');
+const uploadsPath = getUploadsPath();
 if (!fs.existsSync(uploadsPath)) {
     fs.mkdirSync(uploadsPath, { recursive: true });
 }

@@ -61,9 +61,11 @@ app.use(express.json());
 // Parse URL-encoded bodies (for form submissions)
 app.use(express.urlencoded({ extended: true }));
 
+const { getUploadsPath } = require('./utils/volumePath');
+
 // Serve uploaded images as static files
 // Example: http://localhost:5000/uploads/image-123.jpg
-const uploadsPath = process.env.DATA_VOLUME ? path.join(process.env.DATA_VOLUME, 'uploads') : path.join(__dirname, 'uploads');
+const uploadsPath = getUploadsPath();
 app.use('/uploads', express.static(uploadsPath));
 
 // ---- ROUTES ----
