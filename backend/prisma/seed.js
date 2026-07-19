@@ -14,7 +14,16 @@ const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log('🌱 Seeding database...\n');
+    console.log('🌱 Checking if database requires seeding...\n');
+
+    // If an admin user already exists, assume the database is already seeded
+    const existingAdmins = await prisma.adminUser.count();
+    if (existingAdmins > 0) {
+        console.log('✅ Database is already seeded. Skipping seed execution.');
+        return;
+    }
+
+    console.log('🌱 Database is empty. Seeding database...\n');
 
     // ===== 1. ADMIN USER =====
     const hashedPassword = await bcrypt.hash('Admin@123', 10);
