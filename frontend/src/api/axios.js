@@ -9,7 +9,11 @@ import axios from 'axios';
 
 // Create axios instance pointing to our backend
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/api',  // Vercel uses VITE_API_URL, localhost uses /api proxy
+    // In production (Vercel), point directly to the deployed Railway backend!
+    // In local development, use '/api' so Vite proxies to localhost:5000.
+    baseURL: import.meta.env.PROD
+        ? 'https://airy-art-production-4ad7.up.railway.app/api'
+        : '/api',
 });
 
 // Automatically attach the JWT token to every request
