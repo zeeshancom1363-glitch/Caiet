@@ -11,7 +11,7 @@ export default function EditSiteSettings() {
     const [form, setForm] = useState({
         siteName: '', shortDescription: '', contactEmail: '', phone: '',
         address: '', facebookUrl: '', twitterUrl: '', instagramUrl: '', linkedinUrl: '', mapEmbedUrl: '',
-        logoUrl: '', faviconUrl: '', whatsappNumber: ''
+        logoImage: '', faviconImage: '', whatsappNumber: ''
     });
     const [loading, setLoading] = useState(true);
     const logoRef = useRef(null);
@@ -53,11 +53,11 @@ export default function EditSiteSettings() {
                     {/* Logo */}
                     <div className="flex gap-4 items-center">
                         <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border">
-                            {form.logoUrl ? <img src={form.logoUrl} className="w-full h-full object-contain" /> : 'Logo'}
+                            {form.logoImage ? <img src={form.logoImage} className="w-full h-full object-contain" /> : 'Logo'}
                         </div>
                         <div>
                             <label className={labelClass}>Site Logo</label>
-                            <input type="file" ref={logoRef} onChange={e => handleImage('logoUrl', e)} className="hidden" />
+                            <input type="file" ref={logoRef} onChange={e => handleImage('logoImage', e)} className="hidden" />
                             <button type="button" onClick={() => logoRef.current.click()} className="px-3 py-1.5 bg-gray-100 text-sm rounded"><Upload className="w-4 h-4 inline mr-1" /> Upload Logo</button>
                         </div>
                     </div>
