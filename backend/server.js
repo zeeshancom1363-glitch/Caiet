@@ -52,7 +52,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded images as static files
 // Example: http://localhost:5000/uploads/image-123.jpg
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+const uploadsPath = process.env.DATA_VOLUME ? path.join(process.env.DATA_VOLUME, 'uploads') : path.join(__dirname, 'uploads');
+app.use('/uploads', express.static(uploadsPath));
 
 // ---- ROUTES ----
 // All routes are prefixed with /api

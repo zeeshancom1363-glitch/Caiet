@@ -7,12 +7,18 @@
 // ============================================
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+
+const uploadsPath = process.env.DATA_VOLUME ? path.join(process.env.DATA_VOLUME, 'uploads') : path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadsPath)) {
+    fs.mkdirSync(uploadsPath, { recursive: true });
+}
 
 // Configure where uploaded files go and what they're named
 const storage = multer.diskStorage({
     // Save all uploads to the "uploads" folder
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '..', 'uploads'));
+        cb(null, uploadsPath);
     },
     // Give each file a unique name: timestamp + random number + original extension
     filename: function (req, file, cb) {
