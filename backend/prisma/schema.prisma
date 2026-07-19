@@ -1,0 +1,286 @@
+// ============================================
+// FILE: schema.prisma
+// WHAT IT DOES: Defines ALL 20 database tables
+// for the entire CAI&ET website. This is the
+// single source of truth for the database structure.
+// Prisma reads this file and creates the actual
+// SQLite database from it.
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ----- 1. Admin Users -----
+// Stores admin accounts that can log into the admin panel
+model AdminUser {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String   // bcrypt hashed
+  role      String   @default("editor") // "superadmin" or "editor"
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+}
+
+// ----- 2. Site Settings (singleton — only 1 row) -----
+// Global settings like site name, contact info, social links
+model SiteSettings {
+  id              Int     @id @default(autoincrement())
+  siteName        String  @default("CAI&ET")
+  tagline         String  @default("AI & Emerging Technologies")
+  logoImage       String?
+  faviconImage    String?
+  email           String  @default("")
+  phone           String  @default("")
+  whatsappNumber  String  @default("")
+  address         String  @default("")
+  facebookUrl     String  @default("")
+  instagramUrl    String  @default("")
+  linkedinUrl     String  @default("")
+  youtubeUrl      String  @default("")
+  footerAboutText String  @default("")
+  mapEmbedUrl     String  @default("")
+}
+
+// ----- 3. Banner Settings (singleton) -----
+// The announcement bar at the top of the public site
+model BannerSettings {
+  id            Int     @id @default(autoincrement())
+  mainText      String  @default("ADMISSIONS OPEN!")
+  highlightText String  @default("50% OFF – Limited Time!")
+  linkUrl       String  @default("/apply")
+  isActive      Boolean @default(true)
+}
+
+// ----- 4. About Section (singleton) -----
+// Content for the About page + stats counters on homepage
+model AboutSection {
+  id               Int    @id @default(autoincrement())
+  heading          String @default("About CAI&ET")
+  description      String @default("")
+  image            String?
+  missionText      String @default("")
+  visionText       String @default("")
+  yearsExperience  Int    @default(0)
+  studentsCount    Int    @default(0)
+  coursesCount     Int    @default(0)
+  instructorsCount Int    @default(0)
+}
+
+// ----- 5. Course Categories -----
+// Groups courses (e.g. "Artificial Intelligence", "Web Dev")
+model CourseCategory {
+  id           Int      @id @default(autoincrement())
+  name         String
+  slug         String   @unique
+  description  String   @default("")
+  iconName     String   @default("BookOpen")
+  displayOrder Int      @default(0)
+  courses      Course[]
+}
+
+// ----- 6. Courses -----
+// Individual courses offered by the academy
+model Course {
+  id               Int             @id @default(autoincrement())
+  title            String
+  slug             String          @unique
+  categoryId       Int
+  category         CourseCategory  @relation(fields: [categoryId], references: [id])
+  shortDescription String         @default("")
+  fullDescription  String         @default("")
+  image            String?
+  price            Float          @default(0)
+  discountPrice    Float?
+  durationText     String         @default("")
+  level            String         @default("Beginner") // Beginner / Intermediate / Advanced
+  instructorId     Int?
+  instructor       Instructor?    @relation(fields: [instructorId], references: [id])
+  syllabus         String         @default("") // one module per line
+  totalSeats       Int            @default(30)
+  startDate        String?
+  isFeatured       Boolean        @default(false)
+  isActive         Boolean        @default(true)
+  applications     Application[]
+  students         Student[]
+  createdAt        DateTime       @default(now())
+}
+
+// ----- 7. Instructors -----
+// Teaching staff profiles
+model Instructor {
+  id            Int      @id @default(autoincrement())
+  fullName      String
+  designation   String   @default("Instructor")
+  bio           String   @default("")
+  photo         String?
+  email         String   @default("")
+  expertiseTags String   @default("") // comma separated
+  linkedinUrl   String   @default("")
+  displayOrder  Int      @default(0)
+  isActive      Boolean  @default(true)
+  courses       Course[]
+  createdAt     DateTime @default(now())
+}
+
+// ----- 8. Team Members -----
+// Leadership / staff shown on the About page
+model TeamMember {
+  id           Int      @id @default(autoincrement())
+  fullName     String
+  designation  String   @default("")
+  photo        String?
+  bio          String   @default("")
+  linkedinUrl  String   @default("")
+  facebookUrl  String   @default("")
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+// ----- 9. Service Categories -----
+model ServiceCategory {
+  id           Int       @id @default(autoincrement())
+  name         String
+  slug         String    @unique
+  description  String    @default("")
+  iconName     String    @default("Briefcase")
+  displayOrder Int       @default(0)
+  services     Service[]
+}
+
+// ----- 10. Services -----
+model Service {
+  id               Int              @id @default(autoincrement())
+  title            String
+  slug             String           @unique
+  categoryId       Int
+  category         ServiceCategory  @relation(fields: [categoryId], references: [id])
+  shortDescription String          @default("")
+  fullDescription  String          @default("")
+  image            String?
+  iconName         String          @default("Briefcase")
+  priceText        String?
+  isFeatured       Boolean         @default(false)
+  isActive         Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+}
+
+// ----- 11. Services Page Settings (singleton) -----
+model ServicesPageSettings {
+  id             Int     @id @default(autoincrement())
+  pageHeading    String  @default("Our Services")
+  pageSubheading String  @default("Empowering businesses with cutting-edge technology solutions")
+  introText      String  @default("")
+  bannerImage    String?
+}
+
+// ----- 12. Blog Posts -----
+model BlogPost {
+  id          Int       @id @default(autoincrement())
+  title       String
+  slug        String    @unique
+  coverImage  String?
+  excerpt     String    @default("")
+  content     String    @default("")
+  authorName  String    @default("CAI&ET Team")
+  category    String    @default("General")
+  tags        String    @default("") // comma separated
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  viewsCount  Int       @default(0)
+  createdAt   DateTime  @default(now())
+}
+
+// ----- 13. FAQs -----
+model FAQ {
+  id           Int     @id @default(autoincrement())
+  question     String
+  answer       String
+  category     String  @default("General") // Admissions / Courses / General
+  displayOrder Int     @default(0)
+  isActive     Boolean @default(true)
+}
+
+// ----- 14. Applications -----
+// Submitted via the public Apply/Admissions form
+model Application {
+  id             Int      @id @default(autoincrement())
+  fullName       String
+  email          String
+  phone          String
+  courseId        Int
+  course         Course   @relation(fields: [courseId], references: [id])
+  city           String   @default("")
+  educationLevel String   @default("")
+  message        String   @default("")
+  status         String   @default("Pending") // Pending / Approved / Rejected
+  appliedAt      DateTime @default(now())
+}
+
+// ----- 15. Students -----
+model Student {
+  id               Int      @id @default(autoincrement())
+  fullName         String
+  email            String
+  phone            String   @default("")
+  photo            String?
+  enrolledCourseId Int
+  enrolledCourse   Course   @relation(fields: [enrolledCourseId], references: [id])
+  enrollmentDate   DateTime @default(now())
+  status           String   @default("Active") // Active / Completed / Dropped
+}
+
+// ----- 16. Contact Messages -----
+// Submitted via the public Contact form
+model ContactMessage {
+  id         Int      @id @default(autoincrement())
+  fullName   String
+  email      String
+  phone      String   @default("")
+  subject    String   @default("")
+  message    String
+  isRead     Boolean  @default(false)
+  receivedAt DateTime @default(now())
+}
+
+// ----- 17. Newsletter Subscribers -----
+model NewsletterSubscriber {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  subscribedAt DateTime @default(now())
+  isActive     Boolean  @default(true)
+}
+
+// ----- 18. Email Templates -----
+model EmailTemplate {
+  id           Int    @id @default(autoincrement())
+  templateName String
+  subject      String @default("")
+  bodyText     String @default("")
+  templateType String @default("welcome") // welcome / application_received / application_approved
+}
+
+// ----- 19. Site Configuration (flexible key/value) -----
+model SiteConfiguration {
+  id          Int    @id @default(autoincrement())
+  configKey   String @unique
+  configValue String @default("")
+}
+
+// ----- 20. Activity Log -----
+// Automatically records every admin action
+model ActivityLog {
+  id         Int      @id @default(autoincrement())
+  adminName  String
+  actionType String   // "added" / "changed" / "deleted"
+  itemType   String   // e.g. "Course"
+  itemName   String   // e.g. "Flutter App Development"
+  createdAt  DateTime @default(now())
+}

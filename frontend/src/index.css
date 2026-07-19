@@ -1,0 +1,81 @@
+/* ============================================
+   FILE: index.css
+   WHAT IT DOES: Global styles for the entire app.
+   Loads Tailwind layers and sets base fonts / resets.
+   ============================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Base resets & fonts ---------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-body text-body bg-surface antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading text-ink;
+  }
+
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ---------- Utility classes ---------- */
+@layer components {
+  /* Gradient text – use with "bg-gradient-brand bg-clip-text text-transparent" */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #2563EB, #7C3AED);
+  }
+
+  /* Glassmorphism card */
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-xl rounded-2xl;
+  }
+
+  /* Dark mode glass card */
+  .dark .glass-card {
+    @apply bg-gray-800/70 border-gray-700/30;
+  }
+
+  /* Skeleton loader animation */
+  .skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
+  }
+  .dark .skeleton {
+    @apply bg-gray-700;
+  }
+}
+
+/* ---------- Scrollbar styling ---------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+.dark ::-webkit-scrollbar-track {
+  @apply bg-gray-800;
+}
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-gray-600;
+}
