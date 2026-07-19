@@ -19,6 +19,7 @@ router.post('/admin/upload', verifyAdminToken, upload.single('image'), (req, res
     res.json({
         message: 'Image uploaded successfully!',
         filePath,
+        url: filePath, // Added so frontend can access res.data.url
         fileName: req.file.filename,
     });
 });
