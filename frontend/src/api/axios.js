@@ -9,7 +9,7 @@ import axios from 'axios';
 
 // Create axios instance pointing to our backend
 const api = axios.create({
-    baseURL: '/api',  // Vite proxy forwards this to http://localhost:5000/api
+    baseURL: import.meta.env.VITE_API_URL || '/api',  // Vercel uses VITE_API_URL, localhost uses /api proxy
 });
 
 // Automatically attach the JWT token to every request
