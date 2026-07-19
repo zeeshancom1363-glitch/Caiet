@@ -38,9 +38,20 @@ const app = express();
 
 // ---- MIDDLEWARE ----
 
-// Allow requests from the frontend (running on different port)
+// Allow requests from the frontend
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: function (origin, callback) {
+        // Allow requests with no origin, localhost, vercel deployments, or custom FRONTEND_URL
+        if (!origin ||
+            origin.startsWith('http://localhost') ||
+            origin.startsWith('http://127.0.0.1') ||
+            origin.endsWith('.vercel.app') ||
+            origin === process.env.FRONTEND_URL) {
+            callback(null, true);
+        } else {
+            callback(new Error('CORS blocked origin: ' + origin));
+        }
+    },
     credentials: true,
 }));
 
