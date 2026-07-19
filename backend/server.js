@@ -62,10 +62,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const { getUploadsPath } = require('./utils/volumePath');
+const fs = require('fs');
 
 // Serve uploaded images as static files
-// Example: http://localhost:5000/uploads/image-123.jpg
 const uploadsPath = getUploadsPath();
+if (!fs.existsSync(uploadsPath)) {
+    fs.mkdirSync(uploadsPath, { recursive: true });
+}
 app.use('/uploads', express.static(uploadsPath));
 
 // ---- ROUTES ----
